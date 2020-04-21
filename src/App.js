@@ -3,28 +3,38 @@ import React, { Component } from 'react';
 //Utility function -- looks at all the cookies for this page and gives you the one requested
 const getCookie = (cookieName) => {
   // Get name followed by anything except a semicolon
-  const cookieString = RegExp(''+cookieName+'[^;]+').exec(document.cookie);
+  const cookieString = RegExp('' + cookieName + '[^;]+').exec(document.cookie);
   // Return everything after the equal sign, or an empty string if the cookie name not found
-  return decodeURIComponent(!!cookieString ? cookieString.toString().replace(/^[^=]+./,'') : '');
+  return decodeURIComponent(!!cookieString ? cookieString.toString().replace(/^[^=]+./, '') : '');
 }
 
 class App extends Component {
   state = {
     clickCount: getCookie('count') || 0,
-    username: '',
+    username: getCookie('username') || '',
     usernameIsEditable: false,
   }
 
   handleClick = () => {
     const newCount = Number(this.state.clickCount) + 1;
-    
+
     // This is making a cookie called count with the newCount amount
     // It will replace anything called count
     document.cookie = `count=${newCount}`;
-    
+
     this.setState({
       clickCount: newCount,
     });
+  }
+
+  handleChange = (event) =>{
+    const name = event.target.value;
+    console.log ('in handleChange', event.target.value);    
+    document.cookie = `username=${name}`;
+    this.setState({
+       username: name
+    });
+    
   }
 
   editUsername = () => {
@@ -41,16 +51,16 @@ class App extends Component {
 
   render() {
     return (
-      <div>
-        <center>
-          <h1>Click the Cookie!!</h1>
-          <p>
-            Username:
+        <div>
+          <center>
+            <h1>Click the Cookie!!</h1>
+            <p>
+              Username:
             {/* Username should go here */}
-            {/* The next block of code is conditional rendering.
+              {/* The next block of code is conditional rendering.
             Look at the documentation https://reactjs.org/docs/conditional-rendering.html
             if this is new to you. */}
-            {/* 
+              {/* 
               This conditional rendering is using a `ternary` operator. It works like an if/else block.
               The part at the front is being evaluated. The `?` starts the conditions. 
               The first condition is what will be done if true.
@@ -67,22 +77,29 @@ class App extends Component {
               ```
 
             */}
-            {this.state.usernameIsEditable ?
-              <button onClick={this.saveUsername}>Save Username</button> :
-              <button onClick={this.editUsername}>Edit Username</button>
+              {this.state.usernameIsEditable ?
+                <>
+                  <input value={this.state.username} onChange={(event) => this.handleChange(event)}></input>
+                  <button onClick={this.saveUsername}>Save Username</button>
+                </>
+                :
+                <>                  
+                  <span> {this.state.username}</span>
+                  <button onClick={this.editUsername}>Edit Username</button>
+                </>
             }
-          </p>
-          <p>{this.state.clickCount}</p>
-          <span
-            role="img"
-            aria-label="cookie"
-            style={{fontSize: '100px', cursor: 'pointer'}}
-            onClick={this.handleClick}
-          >
-            🍪
+            </p>
+            <p>{this.state.clickCount}</p>
+            <span
+              role="img"
+              aria-label="cookie"
+              style={{ fontSize: '100px', cursor: 'pointer' }}
+              onClick={this.handleClick}
+            >
+              🍪
           </span>
-        </center>
-      </div>
+          </center>
+        </div>
     );
   }
 }
